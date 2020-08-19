@@ -49,12 +49,12 @@ public class PlayerMovement : MonoBehaviour
     //Metodos do monobehaviour:
     void Update()
     {
-
+        SetAnimsState();
         _isGrounded = Physics.Linecast(transform.position, _groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
         _canJump = _isGrounded ? true : false;
         GetInputs(); //optei por pegar os inputs no update para ser mais responsivel, porem a fisica e tratada no fixed update
         JumpAction(); //jump é muito irresponsivel no fixedupdate, ainda precisa ser ajustado de toda forma
-        SetAnimsState();
+        
         
 
         
@@ -166,7 +166,7 @@ public class PlayerMovement : MonoBehaviour
         float maxWidth = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, 10)).x;
 
         _rb.position = new Vector3(Mathf.Clamp(_rb.position.x, minWidth +1, maxWidth -1), _rb.position.y,
-                       Mathf.Clamp(_rb.position.z, _minHeight + 1, _maxHeight - 1)); // o +1 e -1 e para não clipar fora da tela
+                       Mathf.Clamp(_rb.position.z, _minHeight,_maxHeight )); // o +1 e -1 e para não clipar fora da tela
 
     }
 
@@ -174,6 +174,7 @@ public class PlayerMovement : MonoBehaviour
 
     void ZeroSpeed()
     {
+        
         _currentSpeed = 0f;
 
     }
@@ -182,6 +183,7 @@ public class PlayerMovement : MonoBehaviour
 
     void ResetSpeed()
     {
+        
         _currentSpeed = _maxSpeed;
     }
 
