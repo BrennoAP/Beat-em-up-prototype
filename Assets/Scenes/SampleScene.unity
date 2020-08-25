@@ -730,6 +730,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4afa8264e6b197748ac0296a6486fe30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maxHealth: 4
+  _minHeight: -4
+  _maxHeight: -2
   _maxSpeed: 4
 --- !u!136 &1698433274
 CapsuleCollider:
@@ -741,10 +744,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.235
+  m_Radius: 0.18587355
   m_Height: 0.7
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0.049126446, y: 0, z: 0}
 --- !u!54 &1698433275
 Rigidbody:
   m_ObjectHideFlags: 0

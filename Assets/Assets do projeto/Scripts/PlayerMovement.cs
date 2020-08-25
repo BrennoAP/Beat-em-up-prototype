@@ -93,21 +93,26 @@ public class PlayerMovement : MonoBehaviour
                 
                 _rb.velocity = new Vector3(_MovHorizontal * _currentSpeed, _rb.velocity.y, _MovVertical* _currentSpeed);
                 _currentVelocity = _rb.velocity.magnitude;
-                
 
-                //o tutorial origial implementava a mudança do eixo x 
-                //com um metodo para alterar o player scale diretamente 
-                //usei o metodo do spriterender da unity por achar mais simples 
+
+                //o tutorial origial implementava a mudança na rotação  diretamente
+                //aí pensei em usar o metodo do spriterender da unity por achar mais simples 
+                //porem tem o boxcollider do gameobject "attack" que é child e não rotaciona porque so altera o sprite
+                //e não a posicao a rotação do objeto player, causando o box collider so ativar a direita
+                //dai usei o rotate mesmo
                 //não extrai o metodo pois não achei necessario
+
 
                 if (_MovHorizontal < 0 && _facingRigth)
                 {
-                    _sprite.flipX = true;
+                    //_sprite.flipX = true;
+                    transform.eulerAngles = new Vector3(0, 180, 0);
                     _facingRigth = false;
                 }
                 else if(_MovHorizontal > 0 && !_facingRigth)
                 {
-                    _sprite.flipX = false;
+                    //_sprite.flipX = false;
+                    transform.eulerAngles = new Vector3(0, 0, 0);
                     _facingRigth = true;
                 }
 

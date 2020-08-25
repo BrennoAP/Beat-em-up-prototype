@@ -14,7 +14,18 @@ public class Enemy : MonoBehaviour
     private float _walkTimer;
     private float _zForce;
     private float _currentSpeed;
+    private int _currentHealth;
+    private float _damageTimer;
+    private float _damageTime =1.5f;
+    private bool _isDamaged;
+    private float _attackRate = 1.5f;
+    private float _nextAttack ;
+    
+    
 
+
+    [SerializeField]
+    private int _maxHealth =4;
     [SerializeField]
     private float _minHeight;
     [SerializeField]
@@ -28,8 +39,10 @@ public class Enemy : MonoBehaviour
 
         _anim = GetComponent<Animator>();
         _rb = GetComponent<Rigidbody>();
+        
         _groundCheck = transform.Find("GroundCheck");
         _target = FindObjectOfType<PlayerMovement>().transform;
+        _currentHealth = _maxHealth;
 
 
     }
@@ -38,14 +51,24 @@ public class Enemy : MonoBehaviour
     {
         _isGrounded = Physics.Linecast(transform.position, _groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
         _anim.SetBool("Grounded", _isGrounded);
+        _anim.SetBool("Dead",_isDead);
         facePlayer();
         _walkTimer += Time.deltaTime;
+        Attack();
+        
 
     }
 
     private void FixedUpdate()
     {
-        EnemyMovement();
+        if (!_isDamaged)
+        {
+            EnemyMovement();
+        }
+            
+           HitStop();
+        
+
     }
 
     //no tutorial a checagem da facingRight era dentro do update, extrai o metodo
@@ -57,6 +80,7 @@ public class Enemy : MonoBehaviour
         if (_facingRight)
         {
             transform.eulerAngles = new Vector3(0, 180, 0);
+            
 
         }
         else
@@ -70,9 +94,9 @@ public class Enemy : MonoBehaviour
     void EnemyMovement()
     {
 
-        Vector3 targetDistance = _target.position - transform.position; //jeito do tutorial
-        //float distance = Vector3.Distance(_target.position, transform.position); //outro jeito de fazer
-       // Debug.Log("distance é " +distance);
+        Vector3 targetDistance = _target.position - transform.position; //forma do tutorial
+        //float distance = Vector3.Distance(_target.position, transform.position); //outro forma de se fazer
+       
         
        
         float hforce = targetDistance.x / Mathf.Abs(targetDistance.x); // vai retornar um valor entre 0 e 1 que vai ser multiplicado pela
@@ -93,14 +117,86 @@ public class Enemy : MonoBehaviour
         _anim.SetFloat("Speed", Mathf.Abs(_currentSpeed));
 
 
-        // Debug.Log("hforce é " + hforce);
-        Debug.Log("timer" + _walkTimer);
 
 
-        _rb.position = new Vector3(_rb.position.x, _rb.position.y,
+        
+            _rb.position = new Vector3(_rb.position.x, _rb.position.y,
                       Mathf.Clamp(_rb.position.z, _minHeight, _maxHeight));
+        
+            
+        
+        
 
     }
+
+
+    public void TookDamage(int damage)                         //mais uma vez extraí o metodo, estava embolado no update no tutorial
+    {
+        if (!_isDead)
+        {
+            _isDamaged = true;
+            _currentHealth -= damage;
+            _anim.SetTrigger("HitDamage");
+            if (_currentHealth <= 0)
+            {
+                _isDead = true;
+                _rb.AddRelativeForce(new Vector3(3, 4, 0), ForceMode.Impulse);
+                
+            }
+
+        }
+        
+
+    }
+
+    //no tutorial o hitStop foi implementado dentro do update, ficou super spaghetti e eu preferi extrair o metodo 
+    void HitStop() 
+
+    {
+        
+        if (_isDamaged && !_isDead)    //a cada frame verifica se tomou dano e se o objeto ainda esta ativo
+        {
+            _currentSpeed = 0;
+            _damageTimer = Time.deltaTime;   //ao tomar dano é iniciado um contador usando a média de tempo de cada frame
+            if (_damageTime >= _damageTimer) // se o contador alcançar um valor maior que o tempo definido para o "congelamento" ao tomar dano (hitstop)
+            {
+                _isDamaged = false;       // a variavel _isDamaged volta a ser falso e o enemy pode se movimentar novamente
+                _damageTimer = 0;         //reseta o timer, assim caso leve dano novamente a contagem mantém a consistência
+            }
+        }
+    }
+
+
+    //criei um metodo especifico para ataque, interresante seria definir um "attackrange" para não hardcodar direto na checagem
+    //daí fica mais modular e pode ser usado caso o inimigo tenha mais de um tipo de ataque, por enquanto fica como no tutorial
+    void Attack()     
+    {
+        float xrange = Mathf.Abs(transform.position.x - _target.transform.position.x);     //usar 2d em projeto 3d aparentemente
+        float zrange = Mathf.Abs(transform.position.z - _target.transform.position.z);   //atrapalha usar Vector3.distance() ou magnitude
+
+        Debug.Log(xrange);
+
+        if (xrange < 1.5f && zrange <0.2f && _nextAttack < Time.time)
+        {
+            _anim.SetTrigger("Attack");
+            _currentSpeed = 0;
+            _nextAttack = Time.time + _attackRate;
+        }
+
+
+    }
+
+
+
+
+
+    void DisableEnemy()
+    {
+        gameObject.SetActive(false);
+
+
+    }
+
     void ResetSpeed()
     {
         _currentSpeed = _maxSpeed;
