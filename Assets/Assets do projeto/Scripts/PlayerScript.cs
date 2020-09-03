@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerScript : MonoBehaviour //devia ter chamado playerScript,lembrei tarde demais
 {
 
     #region Variaveis da classe
@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody _rb;
     private Animator _anim;
     private Transform _groundCheck;
+    private UiManager _uiManager;
     private bool _isGrounded;
     private bool _isDead;
     private SpriteRenderer _sprite;
@@ -21,6 +22,14 @@ public class PlayerMovement : MonoBehaviour
     private float _MovVertical;
     private bool _JumpPress;
     private float _currentVelocity;
+    private int _playerCurrentHealth;
+
+    //elementos usados na UI
+    //será deixado como public para não fugir muito do tutorial, porem melhor seria usar getters/setters
+    public Sprite playerImage;
+    public string playerName;
+    public int PlayerMaxHealth = 10;
+
 
     [SerializeField]
     private float _currentSpeed;
@@ -44,6 +53,8 @@ public class PlayerMovement : MonoBehaviour
         _groundCheck = gameObject.transform.Find("GroundCheck");
         _currentSpeed = _maxSpeed;
         _sprite = GetComponent<SpriteRenderer>();
+        _uiManager = FindObjectOfType<UiManager>();
+        _playerCurrentHealth = PlayerMaxHealth;
     }
 
     //Metodos do monobehaviour:
@@ -174,6 +185,23 @@ public class PlayerMovement : MonoBehaviour
                        Mathf.Clamp(_rb.position.z, _minHeight,_maxHeight )); // o +1 e -1 e para não clipar fora da tela
 
     }
+
+    public void TookDamage(int damage)
+    {
+        if (!_isDead)
+        {
+            _playerCurrentHealth -= damage;
+            _anim.SetTrigger("HitDamage");
+            _uiManager.UpdateHealthUi(_playerCurrentHealth);
+
+
+
+        }
+      
+
+
+    }
+
 
     //metodo para parar o personagem quando atacar, chamado no animator em attack
 

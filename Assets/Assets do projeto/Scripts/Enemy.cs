@@ -6,11 +6,12 @@ public class Enemy : MonoBehaviour
 {
     private Rigidbody _rb;
     private Animator _anim;
+    private UiManager _uiManager;
     private Transform _groundCheck;
+    private Transform _target;
     private bool _isGrounded;
     private bool _isDead;
     private bool _facingRight;
-    private Transform _target;
     private float _walkTimer;
     private float _zForce;
     private float _currentSpeed;
@@ -20,28 +21,35 @@ public class Enemy : MonoBehaviour
     private bool _isDamaged;
     private float _attackRate = 1.5f;
     private float _nextAttack ;
+
+    
     
     
 
 
     [SerializeField]
-    private int _maxHealth =4;
+    private int _maxHealth = 4;
     [SerializeField]
     private float _minHeight;
     [SerializeField]
     private float _maxHeight;
     [SerializeField]
     private float _maxSpeed =4;
-    
+    [SerializeField]
+    private Sprite _enemySprite;
+    [SerializeField]
+    private string _enemyName;
+
 
     void Start()
     {
 
         _anim = GetComponent<Animator>();
         _rb = GetComponent<Rigidbody>();
+        _uiManager = FindObjectOfType<UiManager>();
         
         _groundCheck = transform.Find("GroundCheck");
-        _target = FindObjectOfType<PlayerMovement>().transform;
+        _target = FindObjectOfType<PlayerScript>().transform;
         _currentHealth = _maxHealth;
 
 
@@ -137,6 +145,7 @@ public class Enemy : MonoBehaviour
             _isDamaged = true;
             _currentHealth -= damage;
             _anim.SetTrigger("HitDamage");
+            _uiManager.UpdateEnemyUi(_maxHealth, _currentHealth, _enemySprite, _enemyName);
             if (_currentHealth <= 0)
             {
                 _isDead = true;
