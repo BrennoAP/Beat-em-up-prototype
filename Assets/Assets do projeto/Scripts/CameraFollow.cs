@@ -59,7 +59,7 @@ public class CameraFollow : MonoBehaviour {
 		if (CheckXMargin())
 		{
 			// ... the target x coordinate should be a Lerp between the camera's current x position and the player's current x position.
-			targetX = Mathf.Lerp(transform.position.x, m_Player.position.x, xSmooth * Time.deltaTime); // a lá, deltatime no lerp, vai vendo kkk
+			targetX = Mathf.Lerp(transform.position.x, m_Player.position.x, xSmooth * Time.deltaTime); // 
 		}
 
 		// If the player has moved beyond the y margin...
